@@ -5,6 +5,7 @@ import android.content.Context
 import android.graphics.*
 import android.util.AttributeSet
 import android.view.View
+import androidx.core.content.withStyledAttributes
 import androidx.core.graphics.green
 import kotlin.properties.Delegates
 
@@ -18,7 +19,9 @@ class LoadingButton @JvmOverloads constructor(
     private var circleAnimator = ValueAnimator()
     private var loadingWidth = 0f
     private var sweepAngle = 0
-
+private var foregroundColor=0
+    private var backgroundcolor = 0
+    private var textColor = 0
 
     private var buttonState: ButtonState by Delegates.observable<ButtonState>(ButtonState.Completed) {
 
@@ -61,6 +64,13 @@ class LoadingButton @JvmOverloads constructor(
 
     init {
         isClickable = true
+        context.theme.obtainStyledAttributes(attrs, R.styleable.LoadingButton, 0, 0).apply {
+            backgroundcolor=getColor(R.styleable.LoadingButton_buttonBackgroundColor,0)
+            textColor=getColor(R.styleable.LoadingButton_buttonTextColor,0)
+            foregroundColor=getColor(R.styleable.LoadingButton_buttonForegroundColor,0)
+        }
+
+
     }
 
     private val paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
@@ -80,15 +90,15 @@ class LoadingButton @JvmOverloads constructor(
     override fun onDraw(canvas: Canvas?) {
         super.onDraw(canvas)
         //button's background
-        paint.color = context.getColor(R.color.colorPrimary)
+        paint.color = backgroundcolor
         canvas?.drawRect(0f, 0f, widthSize.toFloat(), heightSize.toFloat(), paint)
 
         //animate button
-        paint.color = context.getColor(R.color.colorPrimaryDark)
+        paint.color = foregroundColor
         canvas?.drawRect(0f, 0f, (widthSize.toFloat() * loadingWidth) / 100, heightSize.toFloat(), paint)
 
         //button's text
-        paint.color = Color.WHITE
+        paint.color = textColor
         buttonLabel = when (buttonState) {
             ButtonState.Completed -> "Download"
             else -> "We are loading.."
